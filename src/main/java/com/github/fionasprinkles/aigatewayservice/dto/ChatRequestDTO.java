@@ -1,4 +1,4 @@
-package com.github.fionasprinkles.aigatewayservice;
+package com.github.fionasprinkles.aigatewayservice.dto;
 
 import lombok.Data;
 
