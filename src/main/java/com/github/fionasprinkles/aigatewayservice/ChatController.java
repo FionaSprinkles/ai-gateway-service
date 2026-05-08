@@ -1,5 +1,6 @@
 package com.github.fionasprinkles.aigatewayservice;
 
+import com.github.fionasprinkles.aigatewayservice.dto.ChatRequestDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

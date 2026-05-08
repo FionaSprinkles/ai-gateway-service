@@ -1,17 +1,44 @@
 package com.github.fionasprinkles.aigatewayservice;
 
+import com.github.fionasprinkles.aigatewayservice.dto.AiRequestDTO;
+import com.github.fionasprinkles.aigatewayservice.dto.ChatRequestDTO;
+import com.github.fionasprinkles.aigatewayservice.dto.MessageDTO;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.List;
+
+@AllArgsConstructor
 @Service
 public class ChatService {
+
+    private final WebClient webClient;
 
     public String handleChat(ChatRequestDTO request) {
 
         String systemPrompt = mapPersonality(request.getPersonality());
 
-        return "Personality: " + request.getPersonality() +
-                "\nPrompt: " + systemPrompt +
-                "\nMessage: " + request.getMessage();
+        MessageDTO systemMessage =
+                new MessageDTO("system", systemPrompt);
+
+        MessageDTO userMessage =
+                new MessageDTO("user", request.getMessage());
+
+        AiRequestDTO aiRequest =
+                new AiRequestDTO(
+                        "google/gemini-2.5-flash-lite",
+                        List.of(systemMessage, userMessage)
+                );
+
+        System.out.println(aiRequest);
+
+        return webClient.post()
+                .uri("/chat/completions")
+                .bodyValue(aiRequest)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
     }
 
     private String mapPersonality(String personality) {
