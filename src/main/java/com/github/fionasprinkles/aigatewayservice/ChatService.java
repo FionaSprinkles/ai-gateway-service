@@ -1,6 +1,7 @@
 package com.github.fionasprinkles.aigatewayservice;
 
 import com.github.fionasprinkles.aigatewayservice.dto.AiRequestDTO;
+import com.github.fionasprinkles.aigatewayservice.dto.AiResponseDTO;
 import com.github.fionasprinkles.aigatewayservice.dto.ChatRequestDTO;
 import com.github.fionasprinkles.aigatewayservice.dto.MessageDTO;
 import lombok.AllArgsConstructor;
@@ -33,12 +34,17 @@ public class ChatService {
 
         System.out.println(aiRequest);
 
-        return webClient.post()
+        AiResponseDTO response =  webClient.post()
                 .uri("/chat/completions")
                 .bodyValue(aiRequest)
                 .retrieve()
-                .bodyToMono(String.class)
+                .bodyToMono(AiResponseDTO.class)
                 .block();
+
+        return response.getChoices()
+                .getFirst()
+                .getMessage()
+                .getContent();
     }
 
     private String mapPersonality(String personality) {
