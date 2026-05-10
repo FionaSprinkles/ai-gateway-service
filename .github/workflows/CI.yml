@@ -1,0 +1,38 @@
+name: Java CI with Maven
+
+permissions:
+  contents: read
+  actions: read
+  checks: write
+
+on:
+  push:
+    branches: [ "main", "fix/**", "feature/**", "ci/**" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build
+        run: mvn -B clean verify spotless:check
+
+      - name: Publish test results
+        uses: dorny/test-reporter@v3
+        if: always()
+        with:
+          name: Maven Tests
+          path: target/surefire-reports/*.xml
+          reporter: java-junit
+          fail-on-empty: true
