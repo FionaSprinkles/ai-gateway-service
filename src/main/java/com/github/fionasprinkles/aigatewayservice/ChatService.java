@@ -1,9 +1,6 @@
 package com.github.fionasprinkles.aigatewayservice;
 
-import com.github.fionasprinkles.aigatewayservice.dto.AiRequestDTO;
-import com.github.fionasprinkles.aigatewayservice.dto.AiResponseDTO;
-import com.github.fionasprinkles.aigatewayservice.dto.ChatRequestDTO;
-import com.github.fionasprinkles.aigatewayservice.dto.MessageDTO;
+import com.github.fionasprinkles.aigatewayservice.dto.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -16,7 +13,7 @@ public class ChatService {
 
     private final WebClient webClient;
 
-    public String handleChat(ChatRequestDTO request) {
+    public ChatResponseDTO handleChat(ChatRequestDTO request) {
 
         String systemPrompt = mapPersonality(request.getPersonality());
 
@@ -41,10 +38,12 @@ public class ChatService {
                 .bodyToMono(AiResponseDTO.class)
                 .block();
 
-        return response.getChoices()
+        String content =  response.getChoices()
                 .getFirst()
                 .getMessage()
                 .getContent();
+
+        return new ChatResponseDTO(content);
     }
 
     private String mapPersonality(String personality) {

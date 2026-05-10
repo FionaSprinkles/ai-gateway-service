@@ -1,6 +1,7 @@
 package com.github.fionasprinkles.aigatewayservice;
 
 import com.github.fionasprinkles.aigatewayservice.dto.ChatRequestDTO;
+import com.github.fionasprinkles.aigatewayservice.dto.ChatResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,7 +14,7 @@ public class ChatController {
     private final ChatService chatService;
 
     @PostMapping("/chat")
-    public String chat(@RequestBody ChatRequestDTO request) {
+    public ChatResponseDTO chat(@RequestBody ChatRequestDTO request) {
         return chatService.handleChat(request);
     }
 
