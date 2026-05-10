@@ -4,6 +4,11 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ *
+ *Represents OpenRouters response
+ */
+
 @Data
 public class AiResponseDTO {
 
