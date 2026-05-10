@@ -1,63 +1,57 @@
 package com.github.fionasprinkles.aigatewayservice;
 
 import com.github.fionasprinkles.aigatewayservice.dto.*;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-
-import java.util.List;
 
 @AllArgsConstructor
 @Service
 public class ChatService {
 
-    private final WebClient webClient;
+  private final WebClient webClient;
 
-    public ChatResponseDTO handleChat(ChatRequestDTO request) {
+  public ChatResponseDTO handleChat(ChatRequestDTO request) {
 
-        String systemPrompt = mapPersonality(request.getPersonality());
+    String systemPrompt = mapPersonality(request.getPersonality());
 
-        MessageDTO systemMessage =
-                new MessageDTO("system", systemPrompt);
+    MessageDTO systemMessage = new MessageDTO("system", systemPrompt);
 
-        MessageDTO userMessage =
-                new MessageDTO("user", request.getMessage());
+    MessageDTO userMessage = new MessageDTO("user", request.getMessage());
 
-        AiRequestDTO aiRequest =
-                new AiRequestDTO(
-                        "google/gemini-2.5-flash-lite",
-                        List.of(systemMessage, userMessage)
-                );
+    AiRequestDTO aiRequest =
+        new AiRequestDTO("google/gemini-2.5-flash-lite", List.of(systemMessage, userMessage));
 
-        System.out.println(aiRequest);
+    System.out.println(aiRequest);
 
-        AiResponseDTO response =  webClient.post()
-                .uri("/chat/completions")
-                .bodyValue(aiRequest)
-                .retrieve()
-                .bodyToMono(AiResponseDTO.class)
-                .block();
+    AiResponseDTO response =
+        webClient
+            .post()
+            .uri("/chat/completions")
+            .bodyValue(aiRequest)
+            .retrieve()
+            .bodyToMono(AiResponseDTO.class)
+            .block();
 
-        String content =  response.getChoices()
-                .getFirst()
-                .getMessage()
-                .getContent();
+    String content = response.getChoices().getFirst().getMessage().getContent();
 
-        return new ChatResponseDTO(content);
+    return new ChatResponseDTO(content);
+  }
+
+  private String mapPersonality(String personality) {
+
+    if (personality == null) {
+      return "You are a helpful assistant.";
     }
 
-    private String mapPersonality(String personality) {
-
-        if (personality == null) {
-            return "You are a helpful assistant.";
-        }
-
-
-        return switch (personality.toLowerCase()) {
-            case "grandma" -> "You are a sweet but confused grandmother who gives emotional support and random life advice.";
-            case "kid" -> "You speak only in playful robber language and explain things like a child.";
-            case "jealous partner" -> "You are extremely jealous and suspicious. You always respond with jealous follow-up questions.";
-            default -> "You are a helpful assistant.";
-        };
-    }
+    return switch (personality.toLowerCase()) {
+      case "grandma" ->
+          "You are a sweet but confused grandmother who gives emotional support and random life advice.";
+      case "kid" -> "You speak only in playful robber language and explain things like a child.";
+      case "jealous partner" ->
+          "You are extremely jealous and suspicious. You always respond with jealous follow-up questions.";
+      default -> "You are a helpful assistant.";
+    };
+  }
 }

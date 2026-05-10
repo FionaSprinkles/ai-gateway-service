@@ -8,17 +8,15 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class AiClientConfig {
 
-    @Value("${openrouter.api.key}")
-    private String apiKey;
+  @Value("${openrouter.api.key}")
+  private String apiKey;
 
-    @Bean
-    public WebClient webClient() {
-        return WebClient.builder()
-                .baseUrl("https://openrouter.ai/api/v1")
-                .defaultHeader("Authorization", "Bearer " + apiKey)
-                .defaultHeader("Content-Type", "application/json")
-                .build();
-    }
-
-
+  @Bean
+  public WebClient webClient() {
+    return WebClient.builder()
+        .baseUrl("https://openrouter.ai/api/v1")
+        .defaultHeader("Authorization", "Bearer " + apiKey)
+        .defaultHeader("Content-Type", "application/json")
+        .build();
+  }
 }

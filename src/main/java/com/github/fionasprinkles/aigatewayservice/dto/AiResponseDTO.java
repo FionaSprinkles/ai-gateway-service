@@ -1,16 +1,11 @@
 package com.github.fionasprinkles.aigatewayservice.dto;
 
+import java.util.List;
 import lombok.Data;
 
-import java.util.List;
-
-/**
- *
- *Represents OpenRouters response
- */
-
+/** Represents OpenRouters response */
 @Data
 public class AiResponseDTO {
 
-    private List<ChoiceDTO> choices;
+  private List<ChoiceDTO> choices;
 }

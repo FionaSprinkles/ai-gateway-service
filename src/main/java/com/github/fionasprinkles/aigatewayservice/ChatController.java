@@ -11,11 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ChatController {
 
-    private final ChatService chatService;
+  private final ChatService chatService;
 
-    @PostMapping("/chat")
-    public ChatResponseDTO chat(@RequestBody ChatRequestDTO request) {
-        return chatService.handleChat(request);
-    }
-
+  @PostMapping("/chat")
+  public ChatResponseDTO chat(@RequestBody ChatRequestDTO request) {
+    return chatService.handleChat(request);
+  }
 }
