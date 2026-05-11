@@ -27,6 +27,14 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(error);
   }
 
+  @ExceptionHandler(WebClientResponseException.ServiceUnavailable.class)
+  public ResponseEntity<ErrorResponseDTO> handleServiceUnavailable() {
+
+    ErrorResponseDTO error = new ErrorResponseDTO("AI service is currently unavailable");
+
+    return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
+  }
+
   /** Fallback exception handler */
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponseDTO> handleException(Exception e) {
