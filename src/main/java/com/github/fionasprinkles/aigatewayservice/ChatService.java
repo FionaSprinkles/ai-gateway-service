@@ -1,6 +1,7 @@
 package com.github.fionasprinkles.aigatewayservice;
 
 import com.github.fionasprinkles.aigatewayservice.dto.*;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.retry.annotation.Backoff;
@@ -14,6 +15,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 public class ChatService {
 
   private final WebClient webClient;
+  private final SessionMemoryService sessionMemoryService;
 
   @Retryable(
       retryFor = {
@@ -30,8 +32,17 @@ public class ChatService {
 
     MessageDTO userMessage = new MessageDTO("user", request.getMessage());
 
-    AiRequestDTO aiRequest =
-        new AiRequestDTO("google/gemini-2.5-flash-lite", List.of(systemMessage, userMessage));
+    List<MessageDTO> messages = new ArrayList<>();
+
+    messages.add(systemMessage);
+
+    if (request.getSessionId() != null) {
+      messages.addAll(sessionMemoryService.getMessages(request.getSessionId()));
+    }
+
+    messages.add(userMessage);
+
+    AiRequestDTO aiRequest = new AiRequestDTO("google/gemini-2.5-flash-lite", messages);
 
     AiResponseDTO response =
         webClient
@@ -43,6 +54,15 @@ public class ChatService {
             .block();
 
     String content = response.getChoices().getFirst().getMessage().getContent();
+
+    if (request.getSessionId() != null) {
+
+      sessionMemoryService.addMessage(request.getSessionId(), userMessage);
+
+      MessageDTO assistantMessage = new MessageDTO("assistant", content);
+
+      sessionMemoryService.addMessage(request.getSessionId(), assistantMessage);
+    }
 
     return new ChatResponseDTO(content);
   }
@@ -56,9 +76,12 @@ public class ChatService {
     return switch (personality.toLowerCase()) {
       case "grandma" ->
           "You are a sweet but confused grandmother who gives emotional support and random life advice.";
+
       case "kid" -> "You speak only in playful robber language and explain things like a child.";
+
       case "jealous partner" ->
           "You are extremely jealous and suspicious. You always respond with jealous follow-up questions.";
+
       default -> "You are a helpful assistant.";
     };
   }
