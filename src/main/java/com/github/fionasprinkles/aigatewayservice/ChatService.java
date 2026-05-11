@@ -3,8 +3,11 @@ package com.github.fionasprinkles.aigatewayservice;
 import com.github.fionasprinkles.aigatewayservice.dto.*;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 @AllArgsConstructor
 @Service
@@ -12,6 +15,13 @@ public class ChatService {
 
   private final WebClient webClient;
 
+  @Retryable(
+      retryFor = {
+        WebClientResponseException.TooManyRequests.class,
+        WebClientResponseException.ServiceUnavailable.class
+      },
+      maxAttempts = 3,
+      backoff = @Backoff(delay = 2000))
   public ChatResponseDTO handleChat(ChatRequestDTO request) {
 
     String systemPrompt = mapPersonality(request.getPersonality());
@@ -22,8 +32,6 @@ public class ChatService {
 
     AiRequestDTO aiRequest =
         new AiRequestDTO("google/gemini-2.5-flash-lite", List.of(systemMessage, userMessage));
-
-    System.out.println(aiRequest);
 
     AiResponseDTO response =
         webClient
