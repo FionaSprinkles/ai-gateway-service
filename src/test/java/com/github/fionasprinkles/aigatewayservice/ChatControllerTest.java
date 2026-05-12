@@ -24,6 +24,10 @@ class ChatControllerTest {
 
   @MockitoBean private ChatService chatService;
 
+  /**
+   * Tests that the chat endpoint returns a successful response when the ChatService returns a valid
+   * AI reply.
+   */
   @Test
   void shouldReturnChatResponse() throws Exception {
 
