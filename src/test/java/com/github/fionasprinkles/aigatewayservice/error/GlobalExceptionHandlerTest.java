@@ -63,31 +63,25 @@ class GlobalExceptionHandlerTest {
         .andExpect(jsonPath("$.errorMessage").value("Invalid API credentials"));
   }
 
-    /**
-     * Verifies that the API returns HTTP 503
-     * when the AI service is unavailable.
-     */
-    @Test
-    void shouldReturn503WhenServiceUnavailable() throws Exception {
+  /** Verifies that the API returns HTTP 503 when the AI service is unavailable. */
+  @Test
+  void shouldReturn503WhenServiceUnavailable() throws Exception {
 
-        ChatRequestDTO request =
-                new ChatRequestDTO("helper", "Hello", "session-123");
+    ChatRequestDTO request = new ChatRequestDTO("helper", "Hello", "session-123");
 
-        when(chatService.handleChat(any()))
-                .thenThrow(
-                        WebClientResponseException.create(
-                                503,
-                                "Service unavailable",
-                                null,
-                                null,
-                                null));
+    when(chatService.handleChat(any()))
+        .thenThrow(WebClientResponseException.create(503, "Service unavailable", null, null, null));
 
-        mockMvc.perform(
-                        post("/chat")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isServiceUnavailable())
-                .andExpect(jsonPath("$.errorMessage")
-                        .value("AI service is currently unavailable"));
-    }
+    mockMvc
+        .perform(
+            post("/chat")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isServiceUnavailable())
+        .andExpect(jsonPath("$.errorMessage").value("AI service is currently unavailable"));
+  }
+
+  /** Verifies that the API returns HTTP 500 for unexpected exceptions. */
+  @Test
+  void shouldReturn500WhenUnexpectedException() throws Exception {}
 }
