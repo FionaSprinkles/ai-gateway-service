@@ -45,4 +45,18 @@ class ChatControllerTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.response").value("Hi there!"));
   }
+
+  /** Verifies that the API returns HTTP 400 when the message field is blank. */
+  @Test
+  void shouldReturn400WhenMessageIsBlank() throws Exception {
+
+    ChatRequestDTO request = new ChatRequestDTO("helper", "", "session-123");
+
+    mockMvc
+        .perform(
+            post("/chat")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isBadRequest());
+  }
 }
