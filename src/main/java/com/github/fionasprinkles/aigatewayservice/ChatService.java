@@ -67,7 +67,7 @@ public class ChatService {
     return new ChatResponseDTO(content);
   }
 
-  private String mapPersonality(String personality) {
+  protected String mapPersonality(String personality) {
 
     if (personality == null) {
       return "You are a helpful assistant.";
