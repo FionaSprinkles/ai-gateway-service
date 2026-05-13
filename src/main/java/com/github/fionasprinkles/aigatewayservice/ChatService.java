@@ -7,14 +7,14 @@ import lombok.AllArgsConstructor;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 @AllArgsConstructor
 @Service
 public class ChatService {
 
-  private final WebClient webClient;
+  private final RestClient restClient;
   private final SessionMemoryService sessionMemoryService;
 
   @Retryable(
@@ -45,13 +45,12 @@ public class ChatService {
     AiRequestDTO aiRequest = new AiRequestDTO("google/gemini-2.5-flash-lite", messages);
 
     AiResponseDTO response =
-        webClient
+        restClient
             .post()
             .uri("/chat/completions")
-            .bodyValue(aiRequest)
+            .body(aiRequest)
             .retrieve()
-            .bodyToMono(AiResponseDTO.class)
-            .block();
+            .body(AiResponseDTO.class);
 
     String content = response.getChoices().getFirst().getMessage().getContent();
 
