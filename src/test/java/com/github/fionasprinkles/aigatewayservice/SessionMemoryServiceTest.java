@@ -1,51 +1,41 @@
 package com.github.fionasprinkles.aigatewayservice;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.github.fionasprinkles.aigatewayservice.dto.MessageDTO;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 class SessionMemoryServiceTest {
 
-    private SessionMemoryService sessionMemoryService;
+  private SessionMemoryService sessionMemoryService;
 
+  @BeforeEach
+  void setUp() {
+    sessionMemoryService = new SessionMemoryService();
+  }
 
-    @BeforeEach
-    void setUp() {
-        sessionMemoryService = new SessionMemoryService();
-    }
+  /** Verifies that a new session returns an empty message list. */
+  @Test
+  void shouldReturnEmptyListForNewSession() {
 
-    /**
-     * Verifies that a new session returns an empty message list.
-     */
-    @Test
-    void shouldReturnEmptyListForNewSession() {
+    List<MessageDTO> messages = sessionMemoryService.getMessages("session-123");
 
+    assertTrue(messages.isEmpty());
+  }
 
-        List<MessageDTO> messages =
-                sessionMemoryService.getMessages("session-123");
+  /** Verifies that a message can be added to a session. */
+  @Test
+  void shouldAddMessageToSession() {
 
-        assertTrue(messages.isEmpty());
-    }
+    MessageDTO message = new MessageDTO("user", "Hello");
 
-    /**
-     * Verifies that a message can be added to a session.
-     */
-    @Test
-    void shouldAddMessageToSession() {
+    sessionMemoryService.addMessage("session-123", message);
 
-        MessageDTO message =
-                new MessageDTO("user", "Hello");
+    List<MessageDTO> messages = sessionMemoryService.getMessages("session-123");
 
-        sessionMemoryService.addMessage("session-123", message);
-
-        List<MessageDTO> messages =
-                sessionMemoryService.getMessages("session-123");
-
-        assertEquals(1, messages.size());
-        assertEquals("Hello", messages.getFirst().getContent());
-    }
+    assertEquals(1, messages.size());
+    assertEquals("Hello", messages.getFirst().getContent());
+  }
 }
