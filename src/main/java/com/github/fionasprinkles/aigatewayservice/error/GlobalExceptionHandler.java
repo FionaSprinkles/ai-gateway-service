@@ -38,15 +38,6 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(error);
   }
 
-  /** Handle 503 service unavailable */
-  @ExceptionHandler(WebClientResponseException.ServiceUnavailable.class)
-  public ResponseEntity<ErrorResponseDTO> handleServiceUnavailable() {
-
-    ErrorResponseDTO error = new ErrorResponseDTO("AI service is currently unavailable");
-
-    return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
-  }
-
   /** 500 Fallback exception handler */
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponseDTO> handleException(Exception e) {
@@ -54,5 +45,14 @@ public class GlobalExceptionHandler {
     ErrorResponseDTO error = new ErrorResponseDTO("Something went wrong");
 
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+  }
+
+  /** Handle 503 service unavailable */
+  @ExceptionHandler(WebClientResponseException.ServiceUnavailable.class)
+  public ResponseEntity<ErrorResponseDTO> handleServiceUnavailable() {
+
+    ErrorResponseDTO error = new ErrorResponseDTO("AI service is currently unavailable");
+
+    return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
   }
 }
