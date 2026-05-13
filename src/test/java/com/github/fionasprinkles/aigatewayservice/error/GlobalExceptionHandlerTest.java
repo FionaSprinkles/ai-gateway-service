@@ -83,5 +83,18 @@ class GlobalExceptionHandlerTest {
 
   /** Verifies that the API returns HTTP 500 for unexpected exceptions. */
   @Test
-  void shouldReturn500WhenUnexpectedException() throws Exception {}
+  void shouldReturn500WhenUnexpectedException() throws Exception {
+
+    ChatRequestDTO request = new ChatRequestDTO("helper", "Hello", "session-123");
+
+    when(chatService.handleChat(any())).thenThrow(new RuntimeException("Unexpected error"));
+
+    mockMvc
+        .perform(
+            post("/chat")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isInternalServerError())
+        .andExpect(jsonPath("$.errorMessage").value("Something went wrong"));
+  }
 }
